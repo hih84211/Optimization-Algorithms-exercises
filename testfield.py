@@ -48,34 +48,6 @@ def fibonacci_num(n):
     else:
         return fibonacci_num(n - 1) + fibonacci_num(n - 2)
 
-'''def secant(f, X, d, lower=0, upper=1, epsilon=0.005):
-    v = list(ordered(f.free_symbols))
-    l = lower
-    u = upper
-
-    while True:
-        param2 = X - np.dot(u, d)
-        param2 = param2.tolist()
-
-        param1 = X - np.dot(l, d)
-        param1 = param1.tolist()
-
-        f1 = f.subs(list(zip(v, param1)))
-        f2 = f.subs(list(zip(v, param2)))
-
-        x2 = (l - (((u - l) / (y1 - y0)) * y0))
-        y2 = fx(x2)
-
-        if (y2 == 0):
-            return x2
-
-        if abs(x0 - x2) <= epsilon:
-            return x2
-
-        if haveSameSign(y0, y2):
-            x0 = x2
-        else:
-            x1 = x2'''
 
 def fibonacci_search(f, X, d, lower, upper, epslon):
     v = list(ordered(f.free_symbols))
@@ -115,7 +87,6 @@ def fibonacci_search(f, X, d, lower, upper, epslon):
             upper = x2
     #print("alpha: ", x1)
     return x1
-
 
 
 # derivation idea is similar to limit derivation
@@ -193,7 +164,7 @@ if __name__ == '__main__':
     f, g, h = sp.symbols('f g h', cls=sp.Function)
     C = CoordSys3D('C', variable_names=('x1', 'x2', 'x3'))
     sp.init_printing(use_unicode=True)
-    f = (x1 - 1)**2 + (2 - x2**2)**2 + 4 #* (x3 - 3)**4
+    f = (x1 - 1)**2 + (2 - x2**2)**2 + 4 #* (x3 - 3) ** 4
     # f = 100 * ((x2 - x1 ** 2) ** 2) + (1 - x1) ** 2
     v = list(ordered(f.free_symbols))
     #print(np.array(list(Hessian(f).subs(list(zip(v, [5.0, 6.0, 0.0]))))).reshape((3, 3)))

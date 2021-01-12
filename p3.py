@@ -1,7 +1,7 @@
 import numpy as np
 import sympy as sp
 from sympy.vector import CoordSys3D
-from sympy import ordered, Matrix, hessian
+from sympy import ordered, Matrix
 from math import *
 
 Hestenes_Stiefel = 1
@@ -38,6 +38,29 @@ def golden_section_searcher(f, X, d, prev_val, lower, upper, epsilon):
         return val
     else:
         return golden_section_searcher(f, X, d, val, lower, upper, epsilon)
+
+def secant_search(g, X, d, lower=-10, upper=10, epsilon=0.00001):
+    v = list(ordered(g.free_symbols))
+    max = 500
+    alpha_curr = 0
+    alpha = epsilon
+
+    dphi_zero = np.dot(np.array(list(g.subs(list(zip(v, X)))), dtype=np.float), d)
+    dphi_curr = dphi_zero
+
+    i = 0
+    while abs(dphi_curr) > epsilon*abs(dphi_zero):
+        alpha_old = alpha_curr
+        alpha_curr = alpha
+        dphi_old = dphi_curr
+        dphi_curr = np.dot(np.array(list(g.subs(list(zip(v, X+(alpha_curr*d))))), dtype=np.float), d)
+        alpha = (dphi_curr * alpha_old - dphi_old * alpha_curr) / (dphi_curr - dphi_old)
+        i += 1
+        if i%2 == 0:
+            print("i={}, alpha_curr={}, alpha_old={}, alpha={}".format(i, alpha_curr, alpha_old, alpha))
+        if (i >= max) or (abs(dphi_curr) > epsilon * abs(dphi_zero)):
+            #print('alpha: ', alpha)
+            return alpha
 
 def fibonacci_num(n):
     if n <= 2:
@@ -97,7 +120,8 @@ def conjugate_gradient(f, X, iterations, epslon, formula):
     dk = -gk
 
     for i in range(iterations):
-        alpha = golden_section_searcher(f, xk, -dk, 1, -5, 5, 0.0005)
+        #alpha = golden_section_searcher(f, xk, -dk, 1, -5, 5, 0.0005)
+        alpha = secant_search(grad_f, xk, dk)
         #print('alpha: ', alpha)
         #alpha = 0.02
         xk1 = xk + alpha * dk
@@ -135,7 +159,7 @@ if __name__ == '__main__':
     f = (x1 - 1) ** 2 + (2 - x2 ** 2) ** 2 + 4  # * (x3 - 3)**4
     v = list(ordered(f.free_symbols))
 
-    print(conjugate_gradient(f, [-1, 2], 100000, 0.00001, Hestenes_Stiefel))
-    print(conjugate_gradient(f, [-1, 2], 100000, 0.00001, Polak_Ribiere))
-    print(conjugate_gradient(f, [-1, 2], 100000, 0.00001, Fletcher_Reeves))
+    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Hestenes_Stiefel))
+    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Polak_Ribiere))
+    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Fletcher_Reeves))
 
