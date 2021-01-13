@@ -156,18 +156,18 @@ if __name__ == '__main__':
     # f = (x1 - 1) ** 2 + (2 - x2 ** 2) ** 2 + 4  # * (x3 - 3)**4
     v = list(ordered(f.free_symbols))
 
-    hs = conjugate_gradient(f, [-2, 2], 1000, 0.00001, Hestenes_Stiefel)
+    print('\nf = 100*(x2 - x1**2)**2 + (1 - x1)**2\n')
 
-    print('Hestenes_Stiefel: ')
+    hs = conjugate_gradient(f, [-2.0, 2.0], 10000, 0.00001, Hestenes_Stiefel)
+    pr = conjugate_gradient(f, [-2.0, 2.0], 10000, 0.008, Polak_Ribiere)
+    fr = conjugate_gradient(f, [-2.0, 2.0], 10000, 0.0001, Fletcher_Reeves)
+
+    print('Hestenes Stiefel: ')
     print('X={} f(X)={}'.format(hs[0], hs[1]))
     print('')
-    print("Newton's Method: ")
-    print('X={} f(X)={}'.format(nt[0], nt[1]))
+    print("Polak Ribiere: ")
+    print('X={} f(X)={}'.format(pr[0], pr[1]))
     print('')
-    print("Newton's Method: ")
-    print('X={} f(X)={}'.format(nt[0], nt[1]))
-
-    print()
-    print(conjugate_gradient(f, [-2.0, 2.0], 1000, 0.00001, Polak_Ribiere))
-    print(conjugate_gradient(f, [-2.0, 2.0], 1000, 0.0005, Fletcher_Reeves))
+    print("Fletcher Reeves: ")
+    print('X={} f(X)={}'.format(fr[0], fr[1]))
 

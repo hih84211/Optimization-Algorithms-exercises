@@ -55,10 +55,9 @@ class ls():
 
     def plot_regression_line(self, z, plot_title):
         plt.title(plot_title)
-        plt.scatter(z[0], z[1], color="m",
-                    marker="o", s=30)
+        plt.scatter(z[0], z[1], color="m", marker="o", s=20)
 
-        x_line = np.linspace(self.x_train.min(), self.y_train.max(), 100)
+        x_line = np.linspace(self.x_train.min(), self.x_train.max(), 20)
         global y_pred
         y_pred = self.result[2] * np.square(x_line) + self.result[1] * x_line + self.result[0]
         regression_line = y_pred
