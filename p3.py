@@ -155,11 +155,11 @@ if __name__ == '__main__':
     f, g, h = sp.symbols('f g h', cls=sp.Function)
     C = CoordSys3D('C', variable_names=('x1', 'x2', 'x3'))
     sp.init_printing(use_unicode=True)
-    # f = 100*(x2 - x1**2)**2 + (1 - x1)**2
-    f = (x1 - 1) ** 2 + (2 - x2 ** 2) ** 2 + 4  # * (x3 - 3)**4
+    f = 100*(x2 - x1**2)**2 + (1 - x1)**2
+    # f = (x1 - 1) ** 2 + (2 - x2 ** 2) ** 2 + 4  # * (x3 - 3)**4
     v = list(ordered(f.free_symbols))
 
-    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Hestenes_Stiefel))
-    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Polak_Ribiere))
-    print(conjugate_gradient(f, [-1, 2], 1000, 0.00001, Fletcher_Reeves))
+    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Hestenes_Stiefel))
+    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Polak_Ribiere))
+    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Fletcher_Reeves))
 
