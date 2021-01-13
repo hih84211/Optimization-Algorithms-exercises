@@ -27,13 +27,11 @@ def golden_section_searcher(f, X, d, prev_val, lower, upper, epsilon):
             upper = x1
         else:
             lower = x1
-
     else:
         if x2 > x1:
             upper = x2
         else:
             lower = x2
-
     if abs(prev_val - val) <= epsilon:
         return val
     else:
@@ -147,19 +145,29 @@ def conjugate_gradient(f, X, iterations, epslon, formula):
             # print "  iter={}, grad={}, alpha={}, x={}, f(x)={}".format(i, pk, alpha, xk, f(xk))
             # print("  iter={}, x={}, f(x)={}".format(i, xk, f.subs(list(zip(v, xk)))))
 
-    return xk
+    return xk, f.subs(list(zip(v, xk)))
 
 if __name__ == '__main__':
     x1, x2, x3 = sp.symbols('x1 x2 x3')
     k, m, n = sp.symbols('k m n', integer=True)
     f, g, h = sp.symbols('f g h', cls=sp.Function)
-    C = CoordSys3D('C', variable_names=('x1', 'x2', 'x3'))
     sp.init_printing(use_unicode=True)
     f = 100*(x2 - x1**2)**2 + (1 - x1)**2
     # f = (x1 - 1) ** 2 + (2 - x2 ** 2) ** 2 + 4  # * (x3 - 3)**4
     v = list(ordered(f.free_symbols))
 
-    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Hestenes_Stiefel))
-    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Polak_Ribiere))
-    print(conjugate_gradient(f, [-1, 2], 10000, 0.00001, Fletcher_Reeves))
+    hs = conjugate_gradient(f, [-2, 2], 1000, 0.00001, Hestenes_Stiefel)
+
+    print('Hestenes_Stiefel: ')
+    print('X={} f(X)={}'.format(hs[0], hs[1]))
+    print('')
+    print("Newton's Method: ")
+    print('X={} f(X)={}'.format(nt[0], nt[1]))
+    print('')
+    print("Newton's Method: ")
+    print('X={} f(X)={}'.format(nt[0], nt[1]))
+
+    print()
+    print(conjugate_gradient(f, [-2.0, 2.0], 1000, 0.00001, Polak_Ribiere))
+    print(conjugate_gradient(f, [-2.0, 2.0], 1000, 0.0005, Fletcher_Reeves))
 
