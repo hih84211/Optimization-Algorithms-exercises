@@ -5,137 +5,90 @@ import random
 # https://github.com/jhumphry/regressions
 # https://github.com/Networks-Learning/l1-ls.py/blob/master/l1ls/l1_ls.py
 # https://github.com/craig-m-k/Recursive-least-squares
-class CLS():
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+plt.rcParams['figure.figsize'] = (20.0, 10.0)
 
-    """Classical Least Squares Regression
-    The classical least squares regression approach is to initially swap the
-    roles of the X and Y variables, perform linear regression and then to
-    invert the result. It is useful when the number of X variables is larger
-    than the number of calibration samples available, when conventional
-    multiple linear regression would be unable to proceed.
-    Note :
-        The regression matrix A_pinv is found using the pseudo-inverse. In
-        order for this to be calculable, the number of calibration samples
-        ``N`` has be be larger than the number of Y variables ``m``, the
-        number of X variables ``n`` must at least equal the number of Y
-        variables, there must not be any collinearities in the calibration Y
-        data and Yt X must be non-singular.
-    Args:
-        X (ndarray N x n): X calibration data, one row per data sample
-        Y (ndarray N x m): Y calibration data, one row per data sample
-    Attributes:
-        A (ndarray m x n): Resulting regression matrix of X on Y
-        A_pinv (ndarray m x n): Pseudo-inverse of A
-    """
 
-    def __init__(self, X, Y):
-        if X.shape[1] < Yc.shape[1]:
-            raise ParameterError('CLS requires at least as input variables '
-                                 '(columns of X data) as output variables '
-                                 '(columns of Y data)')
+'''
+train_features_vals = np.array(l[0])
+train_desired_outputs_vals = np.array(l[1])
+plt.scatter(train_features_vals, train_desired_outputs_vals, color = 'g', marker = 'o', s = 30)
+plt.title('Training Data')
+plt.show()
+'''
 
-        self.A = linalg.inv(Yc.T @ Yc) @ Yc.T @ Xc
-        self.A_pinv = self.A.T @ linalg.inv(self.A @ self.A.T)
+"""plt.scatter(test_features.values, test_desired_outputs.values, color = 'b', marker = 'o', s = 30)
+plt.title('Testing Data')
+plt.show()
+# Train linear regression model on training set
+"""
+class ls():
+    def __init__(self, data_train, data_test=None):
+        self.data_train = data_train
+        self.data_test = data_test
+        self.x_train = np.array(data_train[0])
+        self.y_train = np.array(data_train[1])
 
-    def prediction(self, Z):
+        if data_test:
+            self.x_test = data_test[0]
+            self.y_test = data_test[1]
 
-        """Predict the output resulting from a given input
-        Args:
-            Z (ndarray of floats): The input on which to make the
-                prediction. Must either be a one dimensional array of the
-                same length as the number of calibration X variables, or a
-                two dimensional array with the same number of columns as
-                the calibration X data and one row for each input row.
-        Returns:
-            Y (ndarray of floats) : The predicted output - either a one
-            dimensional array of the same length as the number of
-            calibration Y variables or a two dimensional array with the
-            same number of columns as the calibration Y data and one row
-            for each input row.
-        """
 
-        if len(Z.shape) == 1:
-            if Z.shape[0] != self.X_variables:
-                raise ParameterError('Data provided does not have the same '
-                                     'number of variables as the original X '
-                                     'data')
-            return self.Y_offset + (Z - self.X_offset) @ self.A_pinv
-        else:
-            if Z.shape[1] != self.X_variables:
-                raise ParameterError('Data provided does not have the same '
-                                     'number of variables as the original X '
-                                     'data')
-            result = np.empty((Z.shape[0], self.Y_variables))
-            for i in range(0, Z.shape[0]):
-                result[i, :] = self.Y_offset + (Z[i, :] - self.X_offset) \
-                    @ self.A_pinv
-            return result
-class RLS:
-    def __init__(self, num_vars, lam, delta):
-        '''
-        num_vars: number of variables including constant
-        lam: forgetting factor, usually very close to 1.
-        '''
-        self.num_vars = num_vars
+    def train(self):
+        N = len(self.x_train)
+        X = np.c_[np.ones(N), self.x_train, np.square(self.x_train)]
+        A = np.linalg.inv(X.T @ X)
+        D = A @ X.T
+        self.result = D @ self.y_train
 
-        # delta controls the initial state.
-        self.A = delta * np.matrix(np.identity(self.num_vars))
-        self.w = np.matrix(np.zeros(self.num_vars))
-        self.w = self.w.reshape(self.w.shape[1], 1)
+    def _get_error(self, z):
+        x = np.array(z[0])
+        y = np.array(z[1])
+        A = np.square(self.result[2] * np.square(x) + self.result[1] * x +
+                      self.result[0] - y)
+        N = len(z)
+        error = np.sum(A) / N
 
-        # Variables needed for add_obs
-        self.lam_inv = lam ** (-1)
-        self.sqrt_lam_inv = sqrt(self.lam_inv)
+        return error
 
-        # A priori error
-        self.a_priori_error = 0
+    def plot_regression_line(self, z, plot_title):
+        plt.title(plot_title)
+        plt.scatter(z[0], z[1], color="m",
+                    marker="o", s=30)
 
-        # Count of number of observations added
-        self.num_obs = 0
+        x_line = np.linspace(self.x_train.min(), self.y_train.max(), 100)
+        global y_pred
+        y_pred = self.result[2] * np.square(x_line) + self.result[1] * x_line + self.result[0]
+        regression_line = y_pred
+        plt.plot(x_line, regression_line, color="g")
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.show()
 
-    def add_obs(self, x, t):
-        '''
-        Add the observation x with label t.
-        x is a column vector as a numpy matrix
-        t is a real scalar
-        '''
-        z = self.lam_inv * self.A * x
-        alpha = float((1 + x.T * z) ** (-1))
-        self.a_priori_error = float(t - self.w.T * x)
-        self.w = self.w + (t - alpha * float(x.T * (self.w + t * z))) * z
-        self.A -= alpha * z * z.T
-        self.num_obs += 1
+        error = self._get_error(z)
 
-    def fit(self, X, y):
-        '''
-        Fit a model to X,y.
-        X and y are numpy arrays.
-        Individual observations in X should have a prepended 1 for constant coefficient.
-        '''
-        for i in range(len(X)):
-            x = np.transpose(np.matrix(X[i]))
-            self.add_obs(x, y[i])
+        return error
 
-    def get_error(self):
-        '''
-        Finds the a priori (instantaneous) error.
-        Does not calculate the cumulative effect
-        of round-off errors.
-        '''
-        return self.a_priori_error
 
-    def predict(self, x):
-        '''
-        Predict the value of observation x. x should be a numpy matrix (col vector)
-        '''
-        return float(self.w.T * x)
 
-    if __name__ == '__main__':
-        def f(t):
-            return 2*(t**2) + 3*t + 4 + 50*(random.random() - 0.5)
+if __name__ == '__main__':
 
-        l = list()
-        for i in range(1, 21):
-            l.append((i, f(i)))
+    def f(t):
+        return 2 * (t ** 2) + 3 * t + 4 + 50 * (random.random() - 0.5)
 
-        print(l)
+    data1 = []
+    data2 = []
+    for i in range(1, 21):
+        data1.append(i)
+        data2.append(f(i))
+    data_set = [data1, data2]
+
+    print('--------------Problem 6(a)----------------')
+    ls_a = ls(data_set)
+    ls_a.train()
+    error = ls_a.plot_regression_line(data_set, 'Training data')
+    print('Average error of the whole data pairs set: ', error)
+
+
