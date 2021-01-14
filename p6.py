@@ -66,9 +66,9 @@ class ls():
         plt.ylabel('y')
         plt.show()
 
-        error = self._get_error(z)
+        line = regression_line
 
-        return error
+        return self.result, self._get_error(z)
 
 
 
@@ -87,7 +87,10 @@ if __name__ == '__main__':
     print('--------------Problem 6(a)----------------')
     ls_a = ls(data_set)
     ls_a.train()
-    error = ls_a.plot_regression_line(data_set, 'Training data')
-    print('Average error of the whole data pairs set: ', error)
+
+    result = ls_a.plot_regression_line(data_set, 'Training data')
+
+    print('f(x) = {}x^2 {:+}x {:+}'.format(result[0][2], result[0][1], result[0][0]))
+    print('Average error of the whole data pairs set: ', result[1])
 
 
